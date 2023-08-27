@@ -137,7 +137,7 @@ class Game(Engine):
 
         if (self.keys[pygame.K_SPACE] or self.enabled_autofire) and self.player.is_moving:
             if time.time() - self.last_shot > self.shot_delay:
-                last_shot = time.time()
+                self.last_shot = time.time()
                 bullet = Bullet(self.player.x, self.player.y, (move_x, move_y))
                 self.bullets.append(bullet)
 
