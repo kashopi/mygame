@@ -1,3 +1,4 @@
+import math
 from random import randint
 import time
 
@@ -58,6 +59,8 @@ class Bullet:
         self.speed_factor = 800
         self.bounces = 0
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
+        self.bullet_image = pygame.image.load("assets/fireball.png")
+        self.bullet_image = pygame.transform.scale(self.bullet_image, (15, 15))
 
     def move(self, dt) -> tuple:
         speed_x, speed_y = self.direction
@@ -68,6 +71,7 @@ class Bullet:
 
     def draw(self, screen):
         pygame.draw.rect(screen, "green", self.rect)
+        screen.blit(self.bullet_image, (self.x, self.y))
 
 
 class Enemy:
@@ -113,11 +117,14 @@ class Game(Engine):
         self.last_shot = time.time()
         self.shot_delay = 0.3
         self.framerate = 60
-        self.enabled_autofire = False
+        self.enabled_autofire = True
         self.last_autofire_press = time.time()
         self.running = True
         self.max_bullet_bounces = 0
         self.keys = None
+        self.mouse_x, self.mouse_y = 0, 0
+        self.cannon_angle = 0
+        self.bgimage = pygame.image.load("assets/bg2.png")
 
     def process_input_events(self):
         self.keys = pygame.key.get_pressed()
@@ -130,6 +137,12 @@ class Game(Engine):
                 self.enabled_autofire = not self.enabled_autofire
                 self.last_autofire_press = time.time()
 
+        self.mouse_x, self.mouse_y = pygame.mouse.get_pos()
+        rel_x, rel_y = self.mouse_x - self.player.x, self.mouse_y - self.player.y
+        self.cannon_angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
+        # self.image = pygame.transform.rotate(self.original_image, int(angle))
+        # self.rect = self.image.get_rect(center=self.position)
+
     def process_player_actions(self):
         move_y = (self.keys[pygame.K_DOWN] - self.keys[pygame.K_UP])
         move_x = (self.keys[pygame.K_RIGHT] - self.keys[pygame.K_LEFT])
@@ -138,7 +151,7 @@ class Game(Engine):
         if (self.keys[pygame.K_SPACE] or self.enabled_autofire) and self.player.is_moving:
             if time.time() - self.last_shot > self.shot_delay:
                 self.last_shot = time.time()
-                bullet = Bullet(self.player.x, self.player.y, (move_x, move_y))
+                bullet = Bullet(self.player.x, self.player.y, (self.mouse_x, self.mouse_y))
                 self.bullets.append(bullet)
 
     def process_enemies_actions(self):
@@ -160,7 +173,7 @@ class Game(Engine):
             self.max_bullet_bounces += 1
             self.screen.fill("gray")
         else:
-            self.screen.fill("black")
+            self.screen.blit(self.bgimage, (0, 0))
 
     def execute_logic(self):
         self.process_player_actions()
@@ -174,7 +187,7 @@ class Game(Engine):
         self._draw_bullets()
         self._draw_enemies()
         self._draw_powerups()
-        self.player.draw(self.screen)
+        self._draw_player()
 
     def process_end_of_frame(self):
         self.flip()
@@ -209,6 +222,10 @@ class Game(Engine):
                 pygame.Vector2(self.player.x, self.player.y), 200 * self.dt)
             e.move(self.dt,
                    v.x, v.y)
+
+    def _draw_player(self):
+        self.player.draw(self.screen)
+
 
     def _draw_enemies(self):
         for e in self.enemies:
