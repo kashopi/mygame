@@ -45,8 +45,10 @@ class Player:
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
 
-    def draw(self, screen):
-        pygame.draw.rect(screen, "red", pygame.Rect(self.x, self.y, self.width, self.height))
+    def draw(self, screen, angle):
+        p_rect = pygame.Rect(self.x, self.y, self.width, self.height)
+        p_rect = pygame.transform.rotate(p_rect, angle)
+        pygame.draw.rect(screen, "red", p_rect)
 
 
 class Bullet:
@@ -151,7 +153,7 @@ class Game(Engine):
         if (self.keys[pygame.K_SPACE] or self.enabled_autofire) and self.player.is_moving:
             if time.time() - self.last_shot > self.shot_delay:
                 self.last_shot = time.time()
-                bullet = Bullet(self.player.x, self.player.y, (self.mouse_x, self.mouse_y))
+                bullet = Bullet(self.player.x, self.player.y, (move_x, move_y))
                 self.bullets.append(bullet)
 
     def process_enemies_actions(self):
@@ -187,7 +189,7 @@ class Game(Engine):
         self._draw_bullets()
         self._draw_enemies()
         self._draw_powerups()
-        self._draw_player()
+        self._draw_player(self.cannon_angle)
 
     def process_end_of_frame(self):
         self.flip()
