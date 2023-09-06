@@ -44,7 +44,6 @@ class Player:
             self.is_moving = False
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
-
     def draw(self, screen, angle):
         p_rect = pygame.Rect(self.x, self.y, self.width, self.height)
         p_rect = pygame.transform.rotate(p_rect, angle)
