@@ -11,23 +11,23 @@ class Character(pygame.sprite.Sprite):
 class Scenario(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self._image = pygame.image.load("/home/ksp/p/mygame/assets/bg.png")
+        self._image = pygame.image.load("assets/bg.png")
         self.width = self._image.get_width()
         self.height = self._image.get_height()
 
-    def get_image(self):
+    def get_image(self) -> pygame.image:
         return self._image
 
-
+    
 class Camera:
-    def __init__(self, viewport_width: int, viewport_height: int, scenario: Scenario):
+    def __init__(self, viewport_width: int, viewport_height: int, scenario: Scenario) -> None:
         self._viewport_width = viewport_width
         self._viewport_height = viewport_height
         self._scenario = scenario
         self._center_x = self._scenario.width // 2
         self._center_y = self._scenario.height // 2
-
-    def move(self, translation_x: int, translation_y: int):
+        
+    def move(self, translation_x: int, translation_y: int) -> None:
 
         self._center_x += translation_x
         self._center_y += translation_y
@@ -72,9 +72,9 @@ class Scene:
 
 
 s = Scenario()
-c = Camera(320, 240, s)
+c = Camera(400, 300, s)
 scene = Scene(s, c)
-screen = pygame.display.set_mode((320, 240))  # , pygame.FULLSCREEN)
+screen = pygame.display.set_mode((640, 480))  # , pygame.FULLSCREEN)
 clock = pygame.time.Clock()
 
 running = True
